@@ -1,0 +1,114 @@
+bands:
+  - name: Black Eyes
+    members: 
+      - Jacob Long
+      - Daniel Martin-McCormick
+      - Hugh McElroy
+      - Dan Caldas
+      - Mike Kanin
+  - name: Mi Ami
+    members:
+      - Daniel Martin-McCormick
+      - Jacob Long
+      - Damon Palermo
+  - name: Fugazi
+    members:
+      - Ian MacKaye
+      - Guy Picciotto
+      - Joe Lally
+      - Brendan Canty
+  - name: The Evens
+    members:
+      - Ian MacKaye
+      - Amy Farina
+  - name: Black Flag
+    members:
+      - Greg Ginn
+      - Ron Reyes
+      - Gregory Moore
+      - Dave Klein
+      - Keith Morris
+      - Raymond Pettibon
+      - Brian Migdol
+      - Kansas
+      - Glen "Spot" Lockett
+      - Chuck Dukowski
+      - Robo
+      - Dez Cadena
+      - Henry Rollins
+      - Bill Stevenson
+      - Emil Johnson
+      - Chuck Biscuits
+      - Kira Roessler
+      - Anthony Martinez
+      - C'el Revuelta
+  - name: The Misfits
+    members:
+      - Glenn Danzig
+      - Diane DiPiazza
+      - Jimmy Battle
+      - Manny Martínez
+      - Franché Coma
+      - Mr. Jim
+      - Bobby Steele
+      - Joey Image
+      - Arthur Googy
+      - Doyle Wolfgang von Frankenstein
+      - Robo
+      - Brian Damage
+      - Dr. Chud
+      - Michale Graves
+      - Marky Ramone
+
+albums:
+  - name: Black Eyes
+    band: Black Eyes
+    label: Dischord
+  - name: Repeater
+    band: Fugazi
+    label: Dischord
+  - name: The Evens
+    band: The Evens
+    label: Dischord
+  - name: Static Age
+    band: The Misfits
+    label: Caroline Records
+  - name: Walk Among Us
+    band: The Misfits
+    label: Slash Records
+  - name: Earth A.D./Wolfs Blood
+    band: The Misfits
+    label: Plan 9
+  - name: American Psycho
+    band: The Misfits
+    label: Geffen
+  - name: Famous Monsters
+    band: The Misfits
+    label: Roadrunner
+  - name: Project 1950
+    band: The Misfits
+    label: Rykodisc
+  - name: Project 1950
+    band: The Misfits
+    label: Misfits Records
+  - name: The Devil's Rain
+    band: The Misfits
+    label: Misfits Records
+  - name: Damaged 
+    band: Black Flag
+    label: SST
+  - name: My War
+    band: Black Flag
+    label: SST
+  - name: Family Man
+    band: Black Flag
+    label: SST
+  - name: Slip It In
+    band: Black Flag
+    label: SST
+  - name: Loose Nut
+    band: Black Flag
+    label: SST
+  - name: In My Head
+    band: Black Flag
+    label: SST
