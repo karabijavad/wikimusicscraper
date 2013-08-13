@@ -2,6 +2,7 @@ require 'rubygems'
 require 'mechanize'
 require 'neography'
 require 'yaml'
+require 'uri'
 
 @neo = Neography::Rest.new
 
@@ -17,6 +18,10 @@ new_node.add_to_index("album_index", "name", "sun")
 
 def findArtist(name)
   return Neography::Node.find("artist_index", "name", name)
+end
+
+def findBand(name)
+  return Neography::Node.find("band_index", "name", name)
 end
 
 def getArtist(name)
@@ -109,16 +114,34 @@ agent.user_agent_alias = 'Mac Safari'
 def nextpage(n, url, agent)
   begin
     page = agent.get url
-  rescue
+  rescue Exception => e
+    puts e
     return
   end
   page.parser.xpath("//th[. = 'Associated acts']/following-sibling::td/a").each do |act|
-    next_artist = act.xpath("text()").to_s.gsub(/[^0-9a-z ]/i, '')
-    if findArtist(next_artist).nil?
-      Neography::Relationship.create(:ASSOCIATED_ACT, n, getArtist(next_artist))
-      nextpage(getArtist(next_artist), act.xpath("@href"), agent)
+    if !act.xpath("@href").to_s.include? "/wiki/"
+      return
+    end
+    next_act = act.xpath("text()").to_s.gsub(/[^0-9a-z ]/i, '')
+    if findBand(next_act).nil?
+      Neography::Relationship.create(:ASSOCIATED_ACT, n, getBand(next_act))
+      puts "Creating node #{next_act}"
+      nextpage(getBand(next_act), act.xpath("@href"), agent)
     end
   end
+
+  page.parser.xpath("//th[. = 'Members']/following-sibling::td/a").each do |act|
+    if !act.xpath("@href").to_s.include? "/wiki/"
+      return
+    end
+    next_act = act.xpath("text()").to_s.gsub(/[^0-9a-z ]/i, '')
+    if findArtist(next_act).nil?
+      Neography::Relationship.create(:MEMBER, n, getArtist(next_act))
+      puts "Creating node #{next_act}"
+      nextpage(getArtist(next_act), act.xpath("@href"), agent)
+    end
+  end
+  
 end
 
-nextpage(Neography::Node.create("name" => "root"), "http://en.wikipedia.org/wiki/Misfits_(band)", agent)
+nextpage(Neography::Node.create("name" => "Modest_mouse"), "http://en.wikipedia.org/wiki/Modest_mouse", agent)
