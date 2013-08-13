@@ -3,6 +3,7 @@ require 'mechanize'
 require 'neography'
 require 'yaml'
 require 'uri'
+require 'htmlentities'
 
 @neo = Neography::Rest.new
 
@@ -22,6 +23,10 @@ end
 
 def findBand(name)
   return Neography::Node.find("band_index", "name", name)
+end
+
+def findLabel(name)
+  return Neography::Node.find("label_index", "name", name)
 end
 
 def getArtist(name)
@@ -73,60 +78,35 @@ def put_label_on_album(l, a)
   Neography::Relationship.create(:RELEASED_ALBUM, l, a)
 end
 
-# data = YAML.load_file('data.yaml')
-
-# if data["artists"].kind_of?(Array)
-#   data["artists"].each do |artist|
-#     a = getArtist artist["name"]
-#   end
-# end
-
-# if data["bands"].kind_of?(Array)
-#   data["bands"].each do |band|
-#     b = getBand band["name"]
-#     band["members"].each do |member|
-#       a = getArtist member
-#       put_artist_in_band a, b
-#     end
-#   end
-# end
-
-# if data["labels"].kind_of?(Array)
-#   data["labels"].each do |label|
-#     l = getLabel label["name"]
-#   end
-# end
-
-# if data["albums"].kind_of?(Array)
-#   data["albums"].each do |album|
-#     a = getAlbum album["name"]
-#     b = getBand album["band"]
-#     l = getLabel album["label"]
-#     put_band_on_album b, a
-#     put_label_on_album l, a
-#   end
-# end
-
-
 agent = Mechanize.new
 agent.user_agent_alias = 'Mac Safari'
 
-def nextpage(n, url, agent)
+def nextpage(n, url, agent, indentation)
+  indentation = indentation + "-"
   begin
     page = agent.get url
   rescue Exception => e
     puts e
     return
   end
+
+  page.parser.xpath("//th[. = 'Labels']/following-sibling::td/a").each do |el|
+    label = el.xpath("text()")
+    Neography::Relationship.create(:LABEL, n, getLabel(HTMLEntities.new.decode label))
+  end
+
   page.parser.xpath("//th[. = 'Associated acts']/following-sibling::td/a").each do |act|
     if !act.xpath("@href").to_s.include? "/wiki/"
       return
     end
     next_act = act.xpath("text()").to_s.gsub(/[^0-9a-z ]/i, '')
-    if findBand(next_act).nil?
-      Neography::Relationship.create(:ASSOCIATED_ACT, n, getBand(next_act))
-      puts "Creating node #{next_act}"
-      nextpage(getBand(next_act), act.xpath("@href"), agent)
+    if findBand(HTMLEntities.new.decode next_act).nil?
+      Neography::Relationship.create(:ASSOCIATED_ACT, n, getBand(HTMLEntities.new.decode next_act))
+      puts "#{indentation}Creating act #{next_act}"
+      nextpage(getBand(HTMLEntities.new.decode next_act), act.xpath("@href"), agent, indentation)
+    else
+      puts "#{indentation}Already have associated act: #{next_act}"
+      Neography::Relationship.create(:ASSOCIATED_ACT, n, getBand(HTMLEntities.new.decode next_act))
     end
   end
 
@@ -135,13 +115,15 @@ def nextpage(n, url, agent)
       return
     end
     next_act = act.xpath("text()").to_s.gsub(/[^0-9a-z ]/i, '')
-    if findArtist(next_act).nil?
-      Neography::Relationship.create(:MEMBER, n, getArtist(next_act))
-      puts "Creating node #{next_act}"
-      nextpage(getArtist(next_act), act.xpath("@href"), agent)
+    if findArtist(HTMLEntities.new.decode next_act).nil?
+      Neography::Relationship.create(:MEMBER, n, getArtist(HTMLEntities.new.decode next_act))
+      puts "Creating artist #{next_act}"
+      nextpage(getArtist(HTMLEntities.new.decode next_act), act.xpath("@href"), agent, indentation)
+    else
+      puts "#{indentation}Already have artist: #{next_act}"
+      Neography::Relationship.create(:MEMBER, n, getArtist(HTMLEntities.new.decode next_act))
     end
   end
-  
 end
 
-nextpage(Neography::Node.create("name" => "Modest_mouse"), "http://en.wikipedia.org/wiki/Modest_mouse", agent)
+nextpage(getBand(HTMLEntities.new.decode "Modest Mouse"), "http://en.wikipedia.org/wiki/Modest_mouse", agent, "-")
