@@ -82,7 +82,7 @@ agent = Mechanize.new
 agent.user_agent_alias = 'Mac Safari'
 
 def nextpage(n, url, agent, indentation)
-  indentation = indentation + "-"
+  indentation = indentation + indentation
   begin
     page = agent.get url
   rescue Exception => e
